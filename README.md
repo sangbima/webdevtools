@@ -25,6 +25,10 @@ Cara pakai:
     $cd webdevtools
     $mkdir data
     ~~~
+- Buat file .env dengan mencopy file env-example
+    ~~~
+    $cp env-example .env
+    ~~~
 - Jalankan perintah:
     ~~~
     $docker-compose up -d nginx postgres workspace
