@@ -29,6 +29,14 @@ Cara pakai:
     ~~~
     $cp env-example .env
     ~~~
+- Buat virtualhost yang akan kita pakai, misal: webapp.test:
+    ~~~
+    $cp nginx/sites/app.conf.example nginx/sites/webapp.test.conf
+    ~~~
+    Edit file webapp.test.conf, sesuaikan dengan virtualhost yang ingin kita buat
+    ~~~
+    $vi nginx/sites/webapp.test.conf
+    ~~~
 - Jalankan perintah:
     ~~~
     $docker-compose up -d nginx postgres workspace
