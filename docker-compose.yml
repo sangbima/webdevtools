@@ -21,6 +21,7 @@ volumes:
     driver: ${VOLUMES_DRIVER}
   docker-in-docker:
     driver: ${VOLUMES_DRIVER}
+  psqldata:
 
 services: 
   #### WORKSPACE #################
@@ -251,7 +252,8 @@ services:
       args:
         - POSTGRES_VERSION=${POSTGRES_VERSION}
     volumes:
-      - ${DATA_PATH_HOST}/postgres:/var/lib/postgresql/data
+      # - ${DATA_PATH_HOST}/postgres:/var/lib/postgresql/data
+      - psqldata:/var/lib/postgresql/data
       - ${POSTGRES_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
     ports:
       - "${POSTGRES_PORT}:5432"
@@ -259,7 +261,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - PGDATA=/tmp
+      # - PGDATA=/tmp
     networks:
       - backend
   
