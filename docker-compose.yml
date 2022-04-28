@@ -70,6 +70,7 @@ services:
       - ./php-worker/supervisord.d:/etc/supervisord.d
     extra_hosts:
       - "dockerhost:${DOCKER_HOST_IP}"
+      - "pmis-simatupang.test:${DOCKER_HOST_IP}"
     ports: 
       - "${WORKSPACE_SSH_PORT}:22"
       - "${WORKSPACE_VUE_CLI_SERVE_HOST_PORT}:8080"
