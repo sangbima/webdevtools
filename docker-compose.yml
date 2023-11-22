@@ -1,12 +1,14 @@
-version: '3.5'
+version: "3.5"
 
-networks: 
+networks:
   frontend:
     driver: ${NETWORKS_DRIVER}
   backend:
     driver: ${NETWORKS_DRIVER}
+  api:
+    driver: ${NETWORKS_DRIVER}
 
-volumes: 
+volumes:
   mysql:
     driver: ${VOLUMES_DRIVER}
   postgres:
@@ -23,10 +25,10 @@ volumes:
     driver: ${VOLUMES_DRIVER}
   psqldata:
 
-services: 
+services:
   #### WORKSPACE #################
   workspace:
-    build: 
+    build:
       context: ./workspace
       args:
         - CHANGE_SOURCE=${CHANGE_SOURCE}
@@ -64,19 +66,19 @@ services:
         - http_proxy
         - https_proxy
         - no_proxy
-    volumes: 
+    volumes:
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
       - docker-in-docker:/certs/client
       - ./php-worker/supervisord.d:/etc/supervisord.d
     extra_hosts:
       - "dockerhost:${DOCKER_HOST_IP}"
       - "pmis-simatupang.test:${DOCKER_HOST_IP}"
-    ports: 
+    ports:
       - "${WORKSPACE_SSH_PORT}:22"
       - "${WORKSPACE_VUE_CLI_SERVE_HOST_PORT}:8080"
       - "${WORKSPACE_VUE_CLI_UI_HOST_PORT}:8000"
     tty: true
-    environment: 
+    environment:
       - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
       - DOCKER_HOST=tcp://docker-in-docker:2376
       - DOCKER_TLS_VERIFY=1
@@ -88,11 +90,11 @@ services:
     links:
       - docker-in-docker
 
-  #### PHP FPM #################  
+  #### PHP FPM #################
   php-fpm:
-    build: 
+    build:
       context: ./php-fpm
-      args: 
+      args:
         - CHANGE_SOURCE=${CHANGE_SOURCE}
         - BASE_IMAGE_TAG_PREFIX=${PHP_FPM_BASE_IMAGE_TAG_PREFIX}
         - WEBDEV_PHP_VERSION=${PHP_VERSION}
@@ -134,11 +136,11 @@ services:
       - ./php-fpm/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
       - docker-in-docker:/certs/client
-    ports: 
+    ports:
       - "9003:9003"
-    expose: 
+    expose:
       - "9000"
-    extra_hosts: 
+    extra_hosts:
       - "dockerhost:${DOCKER_HOST_IP}"
     environment:
       - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
@@ -156,9 +158,9 @@ services:
 
   #### PHP Worker #################
   php-worker:
-    build: 
+    build:
       context: ./php-worker
-      args: 
+      args:
         - CHANGE_SOURCE=${CHANGE_SOURCE}
         - INSTALL_BZ2=${PHP_WORKER_INSTALL_BZ2}
         - INSTALL_GD=${PHP_WORKER_INSTALL_GD}
@@ -168,7 +170,7 @@ services:
         - INSTALL_MYSQL_CLIENT=${PHP_WORKER_INSTALL_MYSQL_CLIENT}
         - PUID=${PHP_WORKER_PUID}
         - PGID=${PHP_WORKER_PGID}
-    volumes: 
+    volumes:
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
       - ./php-worker/supervisord.d:/etc/supervisord.d
     depends_on:
@@ -180,9 +182,9 @@ services:
 
   #### NGINX SERVER #################
   nginx:
-    build: 
+    build:
       context: ./nginx
-      args: 
+      args:
         - CHANGE_SOURCE=${CHANGE_SOURCE}
         - PHP_UPSTREAM_CONTAINER=${NGINX_PHP_UPSTREAM_CONTAINER}
         - PHP_UPSTREAM_PORT=${NGINX_PHP_UPSTREAM_PORT}
@@ -197,11 +199,13 @@ services:
     ports:
       - "${NGINX_HOST_HTTP_PORT}:80"
       - "${NGINX_HOST_HTTPS_PORT}:443"
+      - "${NGINX_HOST_HTTP_CUSTOM_PORT}:8083"
     depends_on:
       - php-fpm
     networks:
       - frontend
       - backend
+      - api
 
   #### MySQL #################
   mysql:
@@ -265,7 +269,7 @@ services:
       # - PGDATA=/tmp
     networks:
       - backend
-  
+
   ### MongoDB ##############################################
   mongo:
     build: ./mongo

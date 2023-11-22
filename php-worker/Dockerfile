@@ -5,7 +5,8 @@
 #
 
 ARG WEBDEV_PHP_VERSION
-FROM php:${WEBDEV_PHP_VERSION}-alpine
+# FROM php:${WEBDEV_PHP_VERSION}-alpine
+FROM php:7.3-alpine
 
 LABEL maintainer="Mahmoud Zalt <mahmoud@zalt.me>"
 
